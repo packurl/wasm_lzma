@@ -25,7 +25,7 @@ const presets=[18,20,21,22,22,23,23,24,25,26];
  * @param {0|18|20|21|22|23|24|25|26|27} [dictionary_power_of_two=0]
  * @return {Uint8Array}
  */
-const lzma=(bytes,level=9,[dictionary_power_of_two=0])=>{
+const lzma=(bytes,level=9,dictionary_power_of_two=0)=>{
   if(level<0) level=0;
   if(level>9) level=9;
   if(dictionary_power_of_two<0) dictionary_power_of_two=0;

@@ -41,9 +41,9 @@ main.busy::before{
 <main></main>
 </body>
 <script type="module">
-// import lzma from './lzma_enc_worker.mjs';
-// import unlzma from './lzma_dec_worker.mjs';
-import {lzma,unlzma} from './lzma.mjs';
+import lzma from './lzma_enc_worker.mjs';
+import unlzma from './lzma_dec_worker.mjs';
+// import {lzma,unlzma} from './lzma.mjs';
 
 const main=document.querySelector('main');
 main.classList.add('ready');
@@ -74,10 +74,10 @@ const dropListener=async e=>{
   const uncompressed=await read(file);
   const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',uncompressed));
   const compressed=await lzma(uncompressed,9);
-  // const decompressed=await unlzma(compressed);
-  // new Uint8Array(await crypto.subtle.digest('SHA-256',decompressed)).forEach((it,i)=>{
-  //   if(it!==hash[i]) throw new Error('Verification failed.');
-  // });
+  const decompressed=await unlzma(compressed);
+  new Uint8Array(await crypto.subtle.digest('SHA-256',decompressed)).forEach((it,i)=>{
+    if(it!==hash[i]) throw new Error('Verification failed.');
+  });
   const blob=new Blob([compressed],{type: 'octet/stream'});
   const url=await new Promise((resolve,reject)=>{
     const reader=new FileReader();
