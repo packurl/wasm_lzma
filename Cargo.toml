@@ -1,0 +1,52 @@
+[package]
+name = "wasm_lzma"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jerome David <programingjd@gmail.com>"]
+categories = ["wasm", "compression"]
+description = "esm modules for lzma/lzma2 compression and/or decompression, with sync and async (worker) versions"
+keywords = ["wasm", "lzma", "lzma2", "esm"]
+license = "Apache-2.0"
+repository = "https://github.com/packurl/wasm_lzma"
+include = [
+    "Cargo.toml", "src", "LICENSE", "README.md", "rust-toolchain.toml",
+    "lzma.d.ts", "lzma.mjs", "lzma.wasm",
+    "lzma_worker.d.ts", "lzma_worker.mjs", "lzma_worker_script.mjs",
+    "lzma_worker_script.js", "lzma_for_importScript.mjs",
+    "lzma_enc.d.ts", "lzma_enc.mjs", "lzma_enc.wasm",
+    "lzma_enc_worker_enc.d.ts", "lzma_enc_worker_enc.mjs", "lzma_enc_worker_script.mjs",
+    "lzma_enc_worker_script.js", "lzma_enc_for_importScript.mjs",
+    "lzma_dec.d.ts", "lzma_dec.mjs", "lzma_dec.wasm",
+    "lzma_dec_worker.d.ts", "lzma_dec_worker.mjs", "lzma_dec_worker_script.mjs",
+    "lzma_dec_worker_script.js", "lzma_dec_for_importScript.mjs",
+    "test1.html", "test2.html", "test3.html",
+    "compress_best.html", "compress_compare.html", "compress_fast.html", "decompress.html"
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies.wasm-bindgen]
+version = "0.2"
+
+[dependencies.lzma-rust2]
+version = "0.2"
+default-features = false
+features = ["encoder"]
+
+[profile.release]
+opt-level = "s"
+lto = "fat"
+codegen-units = 1
+
+#[profile.release]
+#opt-level = "z"
+#lto = "thin"
+#codegen-units = 1
+
+[profile.custom]
+inherits = "release"
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+#panic = "abort"

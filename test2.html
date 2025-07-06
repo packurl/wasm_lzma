@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Test</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%;font:3vmin monospace;background:#222;color:#eee}
+body{min-height:100%;padding:1rem;display:grid;place-items:center}
+main{display:flex;flex-direction:column}
+main > div{height:2rem}
+.ok{color:green}
+.ko{color:red}
+</style>
+</head>
+<body>
+<main>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</main>
+</body>
+<script type="module">
+const mod=import('./lzma_worker.mjs');
+const divs=[...document.querySelectorAll('main>div')];
+divs[0].textContent='Fetching data...';
+const original=new Uint8Array(await (await fetch('./lzma.wasm')).arrayBuffer());
+divs[0].textContent+=`done (${original.byteLength})`;
+divs[1].textContent='Initializing compressor...';
+const {lzma,unlzma}=await mod;
+divs[1].textContent+='done';
+divs[2].textContent='Compressing best quality...';
+const compressedBest=await lzma(original,9);
+divs[2].textContent+=`done (${compressedBest.byteLength} B)`;
+divs[3].textContent='Decompressing...';
+const decompressedBest=await unlzma(compressedBest);
+divs[3].textContent+=`done (${decompressedBest.byteLength} B)`;
+divs[4].textContent='Comparing...';
+const lenBest=decompressedBest.byteLength;
+let sameBest=lenBest===original.byteLength;
+if(sameBest){
+  for(let i=0; i<lenBest; ++i){
+    if(decompressedBest[i]!==original[i]){
+      console.log(i);
+      sameBest=false;
+      break;
+    }
+  }
+}
+divs[4].innerHTML+=sameBest?'<span class="ok">identical</span>':'<span class="ko">not identical</span>';
+divs[5].textContent='Compressing fast...';
+const compressedFast=await lzma(original,1);
+divs[5].textContent+=`done (${compressedFast.byteLength} B)`;
+divs[6].textContent='Decompressing...';
+const decompressedFast=await unlzma(compressedFast);
+divs[6].textContent+=`done (${decompressedFast.byteLength} B)`;
+divs[7].textContent='Comparing...';
+const lenFast=decompressedFast.byteLength;
+let sameFast=lenFast===original.byteLength;
+if(sameFast){
+  for(let i=0; i<lenFast; ++i){
+    if(decompressedFast[i]!==original[i]){
+      console.log(i);
+      sameFast=false;
+      break;
+    }
+  }
+}
+divs[7].innerHTML+=sameFast?'<span class="ok">identical</span>':'<span class="ko">not identical</span>';
+</script>
+</html>
